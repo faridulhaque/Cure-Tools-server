@@ -70,14 +70,13 @@ async function run() {
       const options = { upsert: true };
       const data = {
         $set: {
-          
           name: body.name,
           phn: body.phn,
           address: body.address,
           // img: body.updatedImg,
         },
       };
-      console.log(data)
+
       const result = await usersCollection.updateOne(query, data, options);
       res.send(result);
     });
