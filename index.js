@@ -38,8 +38,16 @@ async function run() {
       const tool = await toolsCollection.findOne(query);
       res.send(tool);
     });
+    // getting information of single user
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
     // adding new user's data in the database
-    app.put("/user/:email", async (req, res) => {
+    app.post("/user/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const user = req.body;
