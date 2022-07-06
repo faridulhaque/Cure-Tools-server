@@ -47,7 +47,7 @@ async function run() {
       res.send(result);
     });
     // adding new user's data in the database
-    app.post("/user/:email", async (req, res) => {
+    app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const user = req.body;
@@ -59,6 +59,25 @@ async function run() {
           img: user.image,
         },
       };
+      const result = await usersCollection.updateOne(query, data, options);
+      res.send(result);
+    });
+    // updating old user's data in the database
+    app.put("/profile/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const body = req.body;
+      const options = { upsert: true };
+      const data = {
+        $set: {
+          
+          name: body.name,
+          phn: body.phn,
+          address: body.address,
+          // img: body.updatedImg,
+        },
+      };
+      console.log(data)
       const result = await usersCollection.updateOne(query, data, options);
       res.send(result);
     });
