@@ -34,6 +34,20 @@ async function run() {
       const tools = await cursor.toArray();
       res.send(tools);
     });
+    // getting all users
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const cursor = usersCollection.find(query);
+      const users = await cursor.toArray();
+      res.send(users);
+    });
+    // getting review data for review page
+    app.get("/reviews", async (req, res) => {
+      const query = {};
+      const cursor = reviewsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
     // getting data for single inventory in the dynamic page.
     app.get("/tool/:id", async (req, res) => {
       const id = req.params.id;
@@ -83,6 +97,28 @@ async function run() {
       const result = await usersCollection.updateOne(query, data, options);
       res.send(result);
     });
+    //store reviews from the users to db
+    app.put("/myReview/:email", async (req, res) => {
+      const email = req.params.email;
+
+      const data = req.body;
+
+      const query = { email: email };
+      const options = { upsert: true };
+      const info = {
+        $set: {
+          email: data.email,
+          name: data.name,
+          img: data.img,
+          ratingText: data.ratingText,
+          ratingStar: data.ratingStar,
+        },
+      };
+
+      const result = await reviewsCollection.updateOne(query, info, options);
+
+      res.send(result);
+    });
     // updating old user's data in the database
     app.put("/profile/:email", async (req, res) => {
       const email = req.params.email;
@@ -98,6 +134,21 @@ async function run() {
       };
       const result = await usersCollection.updateOne(query, data, options);
       res.send(result);
+    });
+    // making or removing an admin
+    app.put("/handleAdmin/:email", async (req, res) => {
+      const email = req.params.email;
+      const data = req.body;
+
+      const filter = { email: email };
+      const options = { upsert: true };
+      const info = {
+        $set: {
+          role: data.role,
+        },
+      };
+      const result = await usersCollection.updateOne(filter, info, options);
+      res.send(result)
     });
     // updating payment information for my orders page in db
     app.put("/order/payment/:id", async (req, res) => {
@@ -140,27 +191,6 @@ async function run() {
         payment_method_types: ["card"],
       });
       res.send({ clientSecret: paymentIntent.client_secret });
-    });
-
-    //store reviews from the users to db
-    app.put("/review/:email", async (req, res) => {
-      const email = req.params.email;
-
-      const data = req.body;
-      const query = { email: email };
-      const options = { upsert: true };
-      const info = {
-        $set: {
-          email: data.email,
-
-          ratingText: data.ratingText,
-          ratingStar: data.ratingStar,
-        },
-      };
-      
-      const result = await reviewsCollection.updateOne(query, info, options);
-
-      res.send(result);
     });
   } finally {
   }
