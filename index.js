@@ -41,6 +41,13 @@ async function run() {
       const users = await cursor.toArray();
       res.send(users);
     });
+    // getting all products for manage products route
+    app.get("/products", async (req, res) => {
+      const query = {};
+      const cursor = toolsCollection.find(query);
+      const products = await cursor.toArray();
+      res.send(products);
+    });
     // getting review data for review page
     app.get("/reviews", async (req, res) => {
       const query = {};
@@ -78,6 +85,20 @@ async function run() {
       const query = { email: email };
       const result = await reviewsCollection.findOne(query);
       res.send(result);
+    });
+    // getting all orders
+    app.get("/orders", async (req, res) => {
+      const query = {};
+      const cursor = ordersCollection.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+    // getting admin
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = await usersCollection.findOne({ email: email });
+      const isAdmin = user.role === "Admin";
+      res.send({ admin: isAdmin });
     });
 
     // adding new user's data in the database
@@ -148,7 +169,20 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(filter, info, options);
-      res.send(result)
+      res.send(result);
+    });
+    // updating shipment status by admins
+    app.put("/shipment/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const data = {
+        $set: {
+          shipmentStatus: true,
+        },
+      };
+      const result = await ordersCollection.updateOne(filter, data, options);
+      res.send(result);
     });
     // updating payment information for my orders page in db
     app.put("/order/payment/:id", async (req, res) => {
@@ -172,10 +206,31 @@ async function run() {
       const result = await ordersCollection.insertOne(orders);
       res.send(result);
     });
+    // add new product by admins
+    app.post("/tools", async (req, res) => {
+      const tools = req.body;
+      const result = await toolsCollection.insertOne(tools);
+      res.send(result);
+    });
 
     // deleting data from my order page
     app.delete("/order/:id", async (req, res) => {
       const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      res.send(result);
+    });
+    // deleting products from manage product page
+    app.delete("/tool/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolsCollection.deleteOne(query);
+      res.send(result);
+    });
+    // delete item from order list
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
       const query = { _id: ObjectId(id) };
       const result = await ordersCollection.deleteOne(query);
       res.send(result);
