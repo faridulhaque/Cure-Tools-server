@@ -52,7 +52,7 @@ async function run() {
       res.send(tools);
     });
     // getting all users
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users", async (req, res) => {
       const query = {};
       const cursor = usersCollection.find(query);
       const users = await cursor.toArray();
@@ -80,7 +80,7 @@ async function run() {
       res.send(tool);
     });
     // getting information of single user
-    app.get("/user/:email", verifyJWT, async (req, res) => {
+    app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
 
@@ -88,7 +88,7 @@ async function run() {
       res.send(result);
     });
     // getting logged in user's orders for my orders page
-    app.get("/myOrders", verifyJWT, async (req, res) => {
+    app.get("/myOrders", async (req, res) => {
       const email = req.query.email;
 
       const query = { email: email };
