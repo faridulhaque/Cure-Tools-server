@@ -8,7 +8,13 @@ const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    optionsSuccessStatus: 200,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // connect with mongodb
@@ -59,7 +65,7 @@ async function run() {
       res.send(users);
     });
     // getting all products for manage products route
-    app.get("/products", verifyJWT, async (req, res) => {
+    app.get("/products", async (req, res) => {
       const query = {};
       const cursor = toolsCollection.find(query);
       const products = await cursor.toArray();
@@ -104,7 +110,7 @@ async function run() {
       res.send(result);
     });
     // getting all orders
-    app.get("/orders", verifyJWT, async (req, res) => {
+    app.get("/orders", async (req, res) => {
       const query = {};
       const cursor = ordersCollection.find(query);
       const orders = await cursor.toArray();
