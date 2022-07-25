@@ -124,10 +124,11 @@ async function run() {
     });
 
     // adding new user's data in the database with generate a token
-    app.put("/user/signUp/:email", async (req, res) => {
+    app.put("/newUser/:email", async (req, res) => {
       const email = req.params.email;
-      const query = { email: email };
+      console.log(email)
       const user = req.body;
+      const query = { email: email };
       const options = { upsert: true };
       const data = {
         $set: {
@@ -137,12 +138,13 @@ async function run() {
           primaryPic: user.primaryPic,
         },
       };
+      
       const result = await usersCollection.updateOne(query, data, options);
-      const token = jwt.sign({ email: email }, process.env.JSON_TOKEN, {
-        expiresIn: "1d",
-      });
+      // const token = jwt.sign({ email: email }, process.env.JSON_TOKEN, {
+      //   expiresIn: "1d",
+      // });
 
-      res.send({ result, token });
+      res.send(result);
     });
     //store reviews from the users to db
     app.put("/myReview/:email", async (req, res) => {
