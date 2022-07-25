@@ -7,15 +7,14 @@ const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const app = express();
+const corsConfig = {
+  origin: true,
+  credentials: true,
+};
 
-app.use(
-  cors({
-    origin: true,
-    optionsSuccessStatus: 200,
-    credentials: true,
-  })
-);
+app.use(cors(corsConfig));
 app.use(express.json());
+app.options("*", cors(corsConfig));
 
 // connect with mongodb
 
@@ -125,7 +124,7 @@ async function run() {
     });
 
     // adding new user's data in the database with generate a token
-    app.put("/user/:email", async (req, res) => {
+    app.put("/user/signUp/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const user = req.body;
